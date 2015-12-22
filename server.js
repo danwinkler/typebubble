@@ -3,6 +3,9 @@ var app = express();
 var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var gameloop = require('node-gameloop');
+var fs = require('fs');
+
+var freqs = JSON.parse( fs.readFileSync( 'bigram_freq.json' ) );
 
 app.set('port', (process.env.PORT || 8080))
 
@@ -15,7 +18,7 @@ app.use( '/js', express.static( __dirname + '/node_modules/jquery/dist/' ) );
 
 // SOCKET STUFF
 
-var modifier = .5;
+var modifier = 4;
 
 var users = {};
 
@@ -33,13 +36,16 @@ io.on( 'connection', function( socket ) {
     users[socket.id] = user;
 
     socket.on("type", function(msg) {
+        var inc = 0;
         if( msg == '\b' ) {
             user.text = user.text.slice( 0, -1 );
+            inc = .001;
         }
         else {
             user.text += msg;
+            inc = freqs[user.text.slice( -2 )] || .001;
         }
-        user.timer += modifier;
+        user.timer += inc * modifier;
         if( isNaN( user.timer ) ) console.log( 'after' )
         io.emit( 'type', user );
     });
