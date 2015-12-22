@@ -20,6 +20,10 @@ var modifier = .5;
 var users = {};
 
 io.on( 'connection', function( socket ) {
+    for( var k in users ) {
+        socket.emit( "type", users[k] );
+    }
+
     var user = {};
     user.text = "";
     user.timer = 0;
