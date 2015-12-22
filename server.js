@@ -45,7 +45,7 @@ io.on( 'connection', function( socket ) {
             user.text += msg;
             inc = freqs[user.text.slice( -2 )] || .001;
         }
-        user.timer += inc * modifier;
+        user.timer += .5; //inc * modifier;
         if( isNaN( user.timer ) ) console.log( 'after' )
         io.emit( 'type', user );
     });
