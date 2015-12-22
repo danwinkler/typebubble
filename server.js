@@ -4,6 +4,8 @@ var http = require('http').Server(app);
 var io = require('socket.io')(http);
 var gameloop = require('node-gameloop');
 
+app.set('port', (process.env.PORT || 8080))
+
 app.get('/', function(req, res){
     res.sendFile(__dirname + '/static/index.html');
 });
@@ -61,6 +63,6 @@ var gameLoopID = gameloop.setGameLoop( function(delta) {
 }, frameTime );
 
 
-http.listen(8080, function(){
-    console.log('listening on *:8080');
+http.listen(app.get('port'), function(){
+    console.log('listening on *.' + app.get('port'));
 });
