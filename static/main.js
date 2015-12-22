@@ -3,7 +3,7 @@ var g;
 var socket;
 
 var TIME_SCALE = .5;
-var FRICTION = .97;
+var FRICTION = .9;
 
 var lastTime = 0;
 
@@ -112,19 +112,43 @@ function draw( timeStep )
         var scaleFactor = user.timer * TIME_SCALE * 100;
 
         var width = scaleFactor;
-        var height = (Math.max( textSize, staticSize )/40.0) * scaleFactor;
+        var height = (40.0/Math.max( textSize, staticSize )) * scaleFactor;
+
+        var edgeRepel = .8;
 
         if( (user.x + width/2) > canvas.width ) {
-            user.dx -= .1;
+            user.dx -= edgeRepel;
         }
 
         if( (user.x - width/2) < 0 ) {
-            user.dx += .1;
+            user.dx += edgeRepel;
+        }
+
+        if( user.y - height/2 < 0 ) {
+            user.dy += edgeRepel;
+        }
+
+        if( user.y + height/2 > canvas.height ) {
+            user.dy -= edgeRepel;
         }
 
         for( var j in users ) {
             if( j == k ) continue;
             var u2 = users[j];
+
+            var cx = (u2.x - user.x);
+            var cy = (u2.y - user.y);
+            var len = Math.sqrt( cx*cx + cy*cy );
+
+            var mx = -(cx * 1.0/len) * 1;
+            var my = -(cy * 1.0/len) * 1;
+            if( len > .1 && len < 300 )
+            {
+                user.dx += mx;
+                user.dy += my;
+                u2.dx -= mx;
+                u2.dy -= my;
+            }
         }
 
         user.dx *= FRICTION;
